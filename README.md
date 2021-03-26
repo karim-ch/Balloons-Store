@@ -1,46 +1,138 @@
-# Getting Started with Create React App
+# Balloons Store
+Live [demo](https://balloonstore.netlify.app/).
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Demo Video
+[![IMAGE ALT TEXT HERE](https://i.ibb.co/ZgTjWYq/store.png)](https://www.youtube.com/watch?v=s-53nM39V6o)
 
-## Available Scripts
+# 1. Getting Started
 
-In the project directory, you can run:
+Install node modules: `npm install`
 
-### `npm start`
+## 1.1. Include a .env file
+Please follow the .env.example file.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 1.2. Scripts
+### Run the development server
+`npm run start`
+### Build the application
+`npm run build`
+### Linting the code
+`npm run lint:fix`
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# 2. Requirements
 
-### `npm test`
+### 2.1 A way to see all the balloons :
+* This list or table should be paginated and filterable in some way
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2.2 A way to see details of a balloon:
+* This should show all available details
+* This should also allow a user to add a quantity of this balloon to their "shopping cart"
 
-### `npm run build`
+### 2.3 A Shopping cart to review selected balloons for purchase:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 2.4 Responsiveness:
+* The page must be responsive across small, medium and large screens.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# 3. Implementation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 3.1 Dependencies
+This project was build based on [CRA](https://github.com/facebook/create-react-app) TS template with the following dependencies:
 
-### `npm run eject`
+- [urql](https://www.npmjs.com/package/urql)
+  A highly customizable and versatile GraphQL client for React.
+- [lodash](https://www.npmjs.com/package/lodash)
+  A javaScript utility library delivering modularity, performance & extras.
+- [styled-components](https://www.npmjs.com/package/styled-components)
+  CSS-in-JS library and theme provider
+- [@styled-system/theme-get](https://www.npmjs.com/package/@styled-system/theme-get)
+  Can be used in any style declaration to get a value from our theme
+- [react-app-rewired]()
+  Provides better CRA flexibility without ejecting
+- [eslint](https://www.npmjs.com/package/eslint)
+  A tool for identifying, reporting and fixing patterns found in javascript.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 3.2 Project architecture
+```
+| src/
+    |- components/
+        |- atoms/
+        |- molecules/
+        |- icons/
+    |- routes/   
+    |- pages/
+    |- graphql/
+        |- fragments/
+        |- queries/
+        |- client.ts
+    |- shared/
+    |- theme/
+        |- cart/
+        |- hooks/
+        |- Layout/
+    |- utils/
+    |- index.ts
+    |- ErrorBoundary.ts
+```
+* **index.ts** : is the main file of the front end application.
+* **ErrorBoundary.ts** : useful for handling React errors.
+* **components/**: is a folder containing the app's custom reusable components.
+    - **Atoms** are small components like Inputs, Headings, Image .etc.
+    - **Molecules** are custom components making some custom composed components like Drawers, Dropdowns .etc.
+    - **Icons** is where our svgs are defined as react components.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **routes/**: This folder contains our react app routes that are grouped to ensure data encapsulation,
+  i.e:
+    - **Routes.tsx** will contain our app public routes like the login & register pages, as well as the main route to the dashboard
+    - **AppRoutes.tsx** will contain our main app dashboard pages.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+* **pages/**: Pages are our app screens, each page will contain its own components. Every component is composed of 3 or more files:
+    - **component.tsx** will contain basic tsx declarations and logic
+    - **withStyle.ts** contains the css styling of the component. This way each component will have its own css.
+    - **components/** If the page/component contains many sub-components, they will be defined in this folder.
+    - **index.ts** will help import the main react tsx component
+    - A component can contain other files like custom hooks for retrieving, or doing any other logic.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+* **graphql/**: Contains the graphql definitions for the app. I've chosen to divide it this way:
+    - **Fragments** will contain the basic reusable fragments of our queries / mutations
+    -  **Queries/** this folder will contain all application queries. It can be refactored later into some sub-folders depending on the context.
+    - The **client** will contain the GraphQl client, we will handle the relayPagination as well as the cache setting and the retry policy in here.
 
-## Learn More
+* **shared/**: This folder will have shared app layout (i.e. a navbar, footer ...), hooks, or other components to be used everywhere.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* **theme/**: In here we will define the theme for our application. I've chosen to work with styled components for its simplicity in creating a theme and
+  defining variables like colors, screen sizes, font sizes, etc ...
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* **utils/**: Contains of subset of helper functions & constants, ... to be used everywhere in our app.
+
+## 3.3 Explanation
+
+### - Building our main components:
+I've chosen to build our atoms and molecules components from scratch instead of importing ready-to-use components.
+This will make our app scale later and will make us independent of other unnecessary npm packages.
+
+For example the dropdown menu. Despite its simple implementation,
+it can be customized later to have for example icons in the dropdown content menu.
+
+### - Creating custom hooks:
+This will ensure separating the UI from the application logic, like retrieving the data or searching it.
+
+### - Using context APIS:
+This will make the application simple and avoid passing down props from components.
+
+### - Persisting the data:
+- All graphql queries will be persisted to the urql client. Cart data will be persisted in the localStorage.
+
+### - Styling:
+- **Style wrapping:** In the entire app, I've chosen to style my components using a HOC pattern using the StyledComponent library.
+  This way we will avoid writing our CSS styled-components into our TSX file.
+- **Responsiveness:** Our app is responsive and respond to the requirements.
+
+### - Rewiring the application:
+- This seems like the only solution to add absolute paths to CRA apps without ejecting.
+
+# 4. Improvements
+if I were to spend additional time on the project, I would work on adding tests,
+improving the typescript types as I'm new to the typescript world.
+
+
+
